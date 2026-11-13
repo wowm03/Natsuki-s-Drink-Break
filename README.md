@@ -18,10 +18,10 @@ Note: Make sure you don't drag it *into* the game folder!
 Please back up your persistent file before installing just to be safe 💕
 
 ## 🐛 Bug Reports & Feedback
-Found a bug or have a suggestion? Please [open an issue](https://github.com/wowm03/Natsuki-s-Drink-Break/issues) or leave a comment on [Reddit] — your feedback is always appreciated 🥺🙏
+Found a bug or have a suggestion? Please [open an issue](https://github.com/wowm03/Natsuki-s-Drink-Break/issues), DM me on Discord (user: wowm) or leave a comment on [Reddit] — your feedback is always appreciated 🥺🙏
 
 ## 💖 Credits
-Creators: Wowm & Wowm's bf
+Creators: [Wowm](https://www.reddit.com/user/Individual-Car-6573/) & Wowm's bf
 
 Co-author: [orchidofred](https://www.reddit.com/user/orchidofred/)
 
