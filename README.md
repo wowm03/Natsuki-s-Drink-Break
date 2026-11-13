@@ -15,7 +15,7 @@ Note: Make sure you don't drag it *into* the game folder!
 4. Launch the game and enjoy 🎀
 
 ## ⚠️ Before You Install
-Please back up your persistent file before installing, just to be safe 💕
+Please back up your persistent file before installing just to be safe 💕
 
 ## 🐛 Bug Reports & Feedback
 Found a bug or have a suggestion? Please [open an issue](https://github.com/wowm03/Natsuki-s-Drink-Break/issues) or leave a comment on [Reddit] — your feedback is always appreciated 🥺🙏
