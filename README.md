@@ -22,9 +22,13 @@ Found a bug or have a suggestion? Please [open an issue](https://github.com/wowm
 
 ## 💖 Credits
 Creators: Wowm & Wowm's bf
+
 Co-author: [orchidofred](https://www.reddit.com/user/orchidofred/)
+
 Testers: [Zombie_B1](https://www.reddit.com/user/Zombie_B1/), [Zhaumbie](https://www.reddit.com/user/zhaumbie/)
+
 Assets from [pngtree](https://pngtree.com/)
+
 [Just Natsuki](https://github.com/Just-Natsuki-Team/NatsukiModDev)
 
 # ☕ made with love for Natsuki and everyone who loves her 💕
