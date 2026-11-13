@@ -3,14 +3,14 @@
 # Corrected full replacement with desk auto-scale/positioning.
 #
 # Install this file as:
-#   game/Submods/jn_weather_drinks_idle_test/jn_weather_drinks_idle.rpy
+#   game/Submods/wowm_jn_weather_drinks_idle/jn_weather_drinks_idle.rpy
 #
 # Required assets, preferred names:
-#   game/Submods/jn_weather_drinks_idle_test/assets/hot_chocolate.png
-#   game/Submods/jn_weather_drinks_idle_test/assets/strawberry_cream_milkshake.png
+#   game/Submods/wowm_jn_weather_drinks_idle/assets/hot_chocolate.png
+#   game/Submods/wowm_jn_weather_drinks_idle/assets/strawberry_cream_milkshake.png
 #
 # Optional milkshake fallback name also supported:
-#   game/Submods/jn_weather_drinks_idle_test/assets/milkshake.png
+#   game/Submods/wowm_jn_weather_drinks_idle/assets/milkshake.png
 #
 # Test with the debug button or console:
 #   jump idle_weather_hot_chocolate
@@ -39,11 +39,11 @@ init -10 python:
     # Asset paths with safe fallback support
     # -------------------------------------------------------------------------
 
-    JN_WD_ASSET_DIR = "Submods/jn_weather_drinks_idle_test/assets/"
+    JN_WD_ASSET_DIR = "Submods/wowm_jn_weather_drinks_idle/assets/"
 
-    JN_WD_HOT_CHOCOLATE_IMAGE_PATH = JN_WD_ASSET_DIR + "hot_chocolate.png"
+    JN_WD_HOT_CHOCOLATE_IMAGE_PATH = JN_WD_ASSET_DIR + "wowm_hot_choco.png"
 
-    JN_WD_MILKSHAKE_IMAGE_PATH = JN_WD_ASSET_DIR + "strawberry_cream_milkshake.png"
+    JN_WD_MILKSHAKE_IMAGE_PATH = JN_WD_ASSET_DIR + "wowm_strawberry_cream_milkshake.png"
     if not renpy.loadable(JN_WD_MILKSHAKE_IMAGE_PATH):
         if renpy.loadable(JN_WD_ASSET_DIR + "milkshake.png"):
             JN_WD_MILKSHAKE_IMAGE_PATH = JN_WD_ASSET_DIR + "milkshake.png"
@@ -52,7 +52,7 @@ init -10 python:
     # Persistent setup
     # -------------------------------------------------------------------------
 
-    if not hasattr(persistent, "jn_weather_drinks_enabled"):
+    if not hasattr(persistent, "jn_weather_drinks_enabled") or persistent.jn_weather_drinks_enabled is None:
         persistent.jn_weather_drinks_enabled = True
 
     # Important fix: this variable may exist but be None from an earlier test.
@@ -66,14 +66,9 @@ init -10 python:
     # Settings
     # -------------------------------------------------------------------------
 
-    # Predetermined time she keeps/enjoys each drink during the idle.
-    # Increase these after testing if you want longer drink idles.
-    JN_WD_HOT_CHOCOLATE_ENJOY_TIME = 20
-    JN_WD_MILKSHAKE_ENJOY_TIME = 20
-
     # Set these to False if you want the drinks to repeat more than once per day.
-    JN_WD_HOT_CHOCOLATE_ONCE_PER_DAY = True
-    JN_WD_MILKSHAKE_ONCE_PER_DAY = True
+    JN_WD_HOT_CHOCOLATE_ONCE_PER_DAY = False
+    JN_WD_MILKSHAKE_ONCE_PER_DAY = False
 
     # Daytime fallback: 6 AM to 6 PM.
     JN_WD_DAY_START_HOUR = 6
@@ -97,103 +92,28 @@ init -10 python:
         hour = jn_wd_now().hour
         return JN_WD_DAY_START_HOUR <= hour < JN_WD_DAY_END_HOUR
 
-    def jn_wd_to_weather_text(value):
-        if value is None:
-            return ""
-
-        try:
-            if hasattr(value, "name"):
-                return str(value.name).lower()
-        except Exception:
-            pass
-
-        try:
-            if hasattr(value, "weather_type"):
-                return str(value.weather_type).lower()
-        except Exception:
-            pass
-
-        try:
-            if hasattr(value, "reference_name"):
-                return str(value.reference_name).lower()
-        except Exception:
-            pass
-
-        try:
-            return str(value).lower()
-        except Exception:
-            return ""
-
     def jn_wd_get_weather_text():
-        candidates = []
-
-        # Common store/global weather variable names.
-        for name in (
-            "jn_current_weather",
-            "current_weather",
-            "weather",
-            "mas_current_weather",
-            "current_background_weather",
-            "jn_current_background_weather",
-        ):
-            try:
-                if hasattr(store, name):
-                    candidates.append(getattr(store, name))
-            except Exception:
-                pass
-
-        # Common persistent weather variable names.
-        for name in (
-            "jn_current_weather",
-            "jn_weather",
-            "weather",
-            "_weather",
-            "mas_current_weather",
-            "current_weather",
-        ):
-            try:
-                if hasattr(persistent, name):
-                    candidates.append(getattr(persistent, name))
-            except Exception:
-                pass
-
-        # Optional weather getter functions.
-        for name in (
-            "get_current_weather",
-            "jn_get_current_weather",
-            "getWeather",
-        ):
-            try:
-                if hasattr(store, name):
-                    func = getattr(store, name)
-                    if callable(func):
-                        candidates.append(func())
-            except Exception:
-                pass
-
-        for item in candidates:
-            text = jn_wd_to_weather_text(item)
-
-            if not text:
-                continue
-
-            if "thunder" in text or "storm" in text or "rain" in text or "shower" in text:
-                persistent.jn_weather_drinks_last_weather = "rain"
-                return "rain"
-
-            if "snow" in text or "sleet" in text or "blizzard" in text:
-                persistent.jn_weather_drinks_last_weather = "snow"
+        try:
+            if store.jn_atmosphere.isCurrentWeatherSnow():
                 return "snow"
 
-            if "sun" in text or "clear" in text or "fair" in text:
-                persistent.jn_weather_drinks_last_weather = "sunny"
+            if store.jn_atmosphere.isCurrentWeatherThunder():
+                return "rain"
+
+            if store.jn_atmosphere.isCurrentWeatherRain():
+                return "rain"
+
+            if store.jn_atmosphere.isCurrentWeatherSunny():
                 return "sunny"
 
-            if "cloud" in text or "overcast" in text:
-                persistent.jn_weather_drinks_last_weather = "cloudy"
+            weather_type = store.jn_atmosphere.current_weather.weather_type
+
+            if weather_type == store.jn_atmosphere.JNWeatherTypes.overcast:
                 return "cloudy"
 
-        persistent.jn_weather_drinks_last_weather = "unknown"
+        except Exception:
+            pass
+
         return "unknown"
 
     def jn_wd_was_done_today(drink_name):
@@ -211,7 +131,13 @@ init -10 python:
         if JN_WD_HOT_CHOCOLATE_ONCE_PER_DAY and jn_wd_was_done_today("hot_chocolate"):
             return False
 
-        return jn_wd_get_weather_text() in ("rain", "snow")
+        weather = jn_wd_get_weather_text()
+
+        if weather in ("rain", "snow", "cloudy"):
+            persistent.jn_weather_drinks_last_weather = weather
+            return True
+
+        return False
 
     def jn_wd_milkshake_condition():
         if not persistent.jn_weather_drinks_enabled:
@@ -220,7 +146,13 @@ init -10 python:
         if JN_WD_MILKSHAKE_ONCE_PER_DAY and jn_wd_was_done_today("milkshake"):
             return False
 
-        return jn_wd_get_weather_text() == "sunny" and jn_wd_is_daytime()
+        weather = jn_wd_get_weather_text()
+
+        if weather == "sunny" and jn_wd_is_daytime():
+            persistent.jn_weather_drinks_last_weather = weather
+            return True
+
+        return False
 
     def jn_wd_safe_conclude_idle():
         try:
@@ -228,7 +160,6 @@ init -10 python:
             jn_idles._concludeIdle()
         except Exception:
             return
-
     def jn_wd_hide_drinks():
         try:
             renpy.hide("prop", layer="master")
@@ -255,6 +186,31 @@ transform jn_wd_idle_drink_anim:
     yoffset 1.0
     alpha 1.0
 
+image natsuki drinks_sippy:
+    block:
+        choice:
+            "natsuki 4ucsdv"
+            pause 4
+            "natsuki 4ndwdr"
+            pause 3
+            "natsuki 4uchts"
+            pause 4
+            "natsuki 1kcssseaf"
+            pause 3
+
+        choice:
+            "natsuki 4cspts"
+            pause 4
+            "natsuki 1udwpu"
+            pause 3
+            "natsuki 4fpltsedz"
+            pause 4
+            "natsuki 1ucsdv"
+            pause 3
+
+
+    repeat
+
 
 # -----------------------------------------------------------------------------
 # Idle registration
@@ -271,7 +227,7 @@ init 6 python:
             _jn_wd_idle_type = None
 
         try:
-            jn_idles.__registerIdle(jn_idles.JNIdle(
+            jn_idles._m1_script0x2didles__registerIdle(jn_idles.JNIdle(
                 label="idle_weather_hot_chocolate",
                 idle_type=_jn_wd_idle_type,
                 affinity_range=(jn_affinity.NORMAL, None),
@@ -284,7 +240,7 @@ init 6 python:
                 pass
 
         try:
-            jn_idles.__registerIdle(jn_idles.JNIdle(
+            jn_idles._m1_script0x2didles__registerIdle(jn_idles.JNIdle(
                 label="idle_weather_milkshake",
                 idle_type=_jn_wd_idle_type,
                 affinity_range=(jn_affinity.NORMAL, None),
@@ -304,59 +260,9 @@ init 6 python:
 
 
 # -----------------------------------------------------------------------------
-# Built-in debug button/menu
+# test
 # -----------------------------------------------------------------------------
 
-screen jn_weather_drinks_debug_button():
-
-    frame:
-        xpos 0.98
-        ypos 0.02
-        anchor (1.0, 0.0)
-        background "#00000088"
-        padding (6, 4)
-
-        textbutton "Drinks Debug":
-            action Show("jn_weather_drinks_debug_menu")
-
-
-screen jn_weather_drinks_debug_menu():
-
-    tag menu
-
-    frame:
-        xpos 0.5
-        ypos 0.5
-        anchor (0.5, 0.5)
-        padding (20, 20)
-
-        vbox:
-            spacing 10
-
-            text "Drink Debug Menu" size 30
-
-            textbutton "Hot Chocolate":
-                action Jump("idle_weather_hot_chocolate")
-
-            textbutton "Milkshake":
-                action Jump("idle_weather_milkshake")
-
-            textbutton "Clear Drink":
-                action Jump("jn_weather_drinks_force_clear")
-
-            textbutton "Reset Daily Drink Lock":
-                action Jump("jn_weather_drinks_reset_daily_lock")
-
-            textbutton "Close":
-                action Hide("jn_weather_drinks_debug_menu")
-
-
-init 7 python:
-    try:
-        if "jn_weather_drinks_debug_button" not in config.overlay_screens:
-            config.overlay_screens.append("jn_weather_drinks_debug_button")
-    except Exception:
-        pass
 
 
 # -----------------------------------------------------------------------------
@@ -365,57 +271,53 @@ init 7 python:
 
 label idle_weather_hot_chocolate:
     $ jn_wd_mark_done_today("hot_chocolate")
-
+    $ Natsuki.setInConversation(True)
+    $ renpy.restart_interaction()
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
     show natsuki 1ullbo
     hide black with Dissolve(0.5)
 
     if persistent.jn_weather_drinks_last_weather == "snow":
-        n 4ullaj "...It's snowing now, huh?{w=0.75}{nw}"
-        n 2fcscs "Mhmmmm.{w=0.5} "
-        extend n 4fspbg "This calls for something warm."
+        n 4ullaj "...It's snowing now, huh?"
+        n 2fcscs "Mhmmmm. "
+        extend 4fspbg "This calls for something warm."
     else:
-        n 1ullbo "...Oh, is it raining?{w=0.75}{nw}"
-        extend 2fcssm " Hm.{w=0.5} Then I'm getting something warm."
+        n 1ullbo "...Oh, is it raining?"
+        extend 2fcssm " Hm. Then I'm getting something warm."
 
     n 2fsqsm "And not just plain hot chocolate, either."
-    n 2fchbg "With whipped cream and marshmallows.{w=0.5}"
+    n 2fchbg "With whipped cream and marshmallows."
     extend " Obviously."
     n 1uchsm "I'll be right back!"
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
-    $ jnPause(0.5)
     show jn_wd_hot_chocolate at jn_wd_idle_drink_anim zorder JN_PROP_ZORDER
     show natsuki 1fchsmeme
     play audio drawer
-    $ jnPause(1.0)
     hide black with Dissolve(0.5)
 
     n 1fchbg "There we go!"
-    n 2fsqsm "Chocolate, whipped cream, marshmallows...{w=0.5}"
+    n 2fsqsm "Chocolate, whipped cream, marshmallows..."
     extend " yep."
     n 4fwlbg "Bad weather is way easier to deal with like this."
 
-    show natsuki 1fchsmeme
-    $ jnPause(JN_WD_HOT_CHOCOLATE_ENJOY_TIME)
-    $ jnClickToContinue(silent=False)
+    window hide
+    show natsuki drinks_sippy
+    $ jnClickToContinue()
 
     n 1uchsm "Mmm..."
-    extend n 2ucsts " that was soo good."
+    extend 2ucsts " that was soo good."
     n 2fcsss "I guess rain and snow aren't completely terrible when I have something like this."
     n 4nsrbg "I'm gonna put this away before I start wanting another one."
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
-    $ jnPause(0.5)
     hide jn_wd_hot_chocolate
     hide prop jn_wd_hot_chocolate
     play audio drawer
-    $ jnPause(1.0)
     show natsuki 1fchsmeme
     hide black with Dissolve(0.5)
 
     n 1unmbo "Okay, I'm back."
-
     $ jn_wd_safe_conclude_idle()
     return
 
@@ -426,6 +328,9 @@ label idle_weather_hot_chocolate:
 
 label idle_weather_milkshake:
     $ jn_wd_mark_done_today("milkshake")
+    $ Natsuki.setInConversation(True)
+    $ renpy.restart_interaction()
+
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
     show natsuki 1ullbo
@@ -438,36 +343,31 @@ label idle_weather_milkshake:
     n 1uchbg "I'll grab one really quick!"
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
-    $ jnPause(0.5)
     show jn_wd_milkshake at jn_wd_idle_drink_anim zorder JN_PROP_ZORDER
     show natsuki 1fchsmeme
     play audio drawer
-    $ jnPause(1.0)
     hide black with Dissolve(0.5)
 
     n 1fchbg "Okay, now this looks good."
     n 2fcssm "Strawberry, cream, and just enough chocolate to make it better."
     n 2fsqsm "Don't get jealous."
 
-    show natsuki 1fchsmeme
-    $ jnPause(JN_WD_MILKSHAKE_ENJOY_TIME)
-    $ jnClickToContinue(silent=False)
+    window hide
+    show natsuki drinks_sippy
+    $ jnClickToContinue()
 
     n 1uchsm "Mmm... that was really good."
     n 2fcsss "Cold, sweet, and not too heavy."
     n 2fsqsm "I'm putting it away before I get brain freeze."
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
-    $ jnPause(0.5)
     hide jn_wd_milkshake
     hide prop jn_wd_milkshake
     play audio drawer
-    $ jnPause(1.0)
     show natsuki 1fchsmeme
     hide black with Dissolve(0.5)
 
     n 1unmbo "Alright, I'm done."
-
     $ jn_wd_safe_conclude_idle()
     return
 
