@@ -283,7 +283,7 @@ label idle_weather_hot_chocolate:
         extend 4fspbg "This calls for something warm."
     else:
         n 1ullbo "...Oh, is it raining?"
-        extend 2fcssm " Hm. Then I'm getting something warm."
+        extend 2fcssm " Hm.{w=0.2} Then I'm getting something warm."
 
     n 2fsqsm "And not just plain hot chocolate, either."
     n 2fchbg "With whipped cream and marshmallows."
@@ -297,18 +297,51 @@ label idle_weather_hot_chocolate:
     hide black with Dissolve(0.5)
 
     n 1fchbg "There we go!"
-    n 2fsqsm "Chocolate, whipped cream, marshmallows..."
+    n 2fsqsm "Chocolate,{w=0.2} whipped cream,{w=0.2} marshmallows...{w=0.5}{nw}"
     extend " yep."
     n 4fwlbg "Bad weather is way easier to deal with like this."
 
     window hide
     show natsuki drinks_sippy
     $ jnClickToContinue()
+    $ random_response = renpy.random.randint(1, 2)
 
-    n 1uchsm "Mmm..."
-    extend 2ucsts " that was soo good."
-    n 2fcsss "I guess rain and snow aren't completely terrible when I have something like this."
-    n 4nsrbg "I'm gonna put this away before I start wanting another one."
+    if random_response == 1:
+        n 1uchsm "Mmm..."
+        extend 2ucsts " that was soo good."
+        n 2fcsss "I guess rain and snow aren't completely terrible when I have something like this."
+        n 4nsrbg "I'm gonna put this away before I start wanting another one."
+
+    elif random_response == 2:
+        n "Days like this are made for hot chocolate."
+        n "Not that I've been thinking about it all day or anything...{w=0.9}{nw}"
+        extend " okay,{w=0.3} maybe {cps=17}jusstt{/cps} a little."
+        n "Better put it away before I get too comfortable and ask for more."
+
+    elif random_response == 3:
+        if Natsuki.isLove(higher=True):
+            $ chosen_tease = jn_utils.getRandomTease()
+            $ chosen_endearment = jn_utils.getRandomEndearment()
+            n "Ahhh...[w=0.4]{nw}"
+            extend " that hits the spot."
+            n "Whatever's going on outside, this makes it so much more tolerable."
+            n "...{w=0.4}You make it better too,[w=0.6] [chosen_tease],{w=0.67}{nw}"
+            extend " ehehe."
+            n "Though...{w=0.4} I should stop here.{w=0.6}{nw}"
+            extend " Otherwise I'll want another one,{w=0.7}{nw}"
+            extend " and then another."
+
+        elif Natsuki.isEnamored(higher=True):
+            n "Better put this down now,{w=0.78}{nw}"
+            extend " or I'll be wanting another before long."
+
+        elif Natsuki.isHappy(higher=True):
+            n "Cold weather,{w=0.4}{nw}"
+            extend " warm drink {w=0.5}{nw}"
+            extend "...{w=0.4}and you hovering around...{w=0.6}"
+            n "...{w=0.4}It's not terrible."
+            n "Anyways,{w=0.3} away it goes —{w=0.67}{nw}"
+            extend " before I want another."
 
     show black zorder JN_BLACK_ZORDER with Dissolve(0.5)
     hide jn_wd_hot_chocolate
