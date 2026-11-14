@@ -1,6 +1,6 @@
 # 🍓 Natsuki's Drink Break
 ## ✨ About
-A submod that adds 2 custom idles for Natsuki to drink her favourite drinks -- Hot chocolate & Strawberry milkshake according to the weather respectively! 
+This is a submod that adds 2 custom idles for Natsuki to drink her favourite drinks -- Hot chocolate & Strawberry milkshake according to the weather respectively! 
 
 ## 📥 Download
 Get the latest version from the [Releases page]!
