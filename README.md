@@ -8,7 +8,7 @@ Get the latest version from the [Releases page]!
 ## 🛠️ Installation
 1. Download the latest .zip from the Releases page.
 2. Extract/unzip the file.
-3. Drag and drop the game/ folder into your main JN folder.
+3. Drag and drop the folder into your /game/submod folder.
 
 Note: Make sure you don't drag it *into* the game folder!
 
